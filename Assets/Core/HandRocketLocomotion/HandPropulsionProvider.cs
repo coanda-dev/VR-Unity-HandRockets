@@ -13,43 +13,43 @@ namespace Core.HandRocketLocomotion
     public class HandPropulsionProvider : LocomotionProvider
     {
         [SerializeField]
-        [Tooltip("The Input System Action that will be used to read Snap Turn data from the left hand controller. Must be a Value Vector2 Control.")]
-        InputActionProperty m_LeftHandSnapTurnAction;
+        [Tooltip("The Input System Action that will be used to read Propulsion data from the left hand controller. Must be a Value Button Control.")]
+        InputActionProperty m_LeftHandPropulsionAction;
         /// <summary>
-        /// The Input System Action that will be used to read Snap Turn data sent from the left hand controller. Must be a <see cref="InputActionType.Value"/> <see cref="Vector2Control"/> Control.
+        /// The Input System Action that will be used to read Propulsion data from the left hand controller. Must be a <see cref="InputActionType.Value"/> <see cref="ButtonControl"/> Control.
         /// </summary>
-        public InputActionProperty LeftHandSnapTurnAction
+        public InputActionProperty LeftHandPropulsionAction
         {
-            get => m_LeftHandSnapTurnAction;
-            set => SetInputActionProperty(ref m_LeftHandSnapTurnAction, value);
+            get => m_LeftHandPropulsionAction;
+            set => SetInputActionProperty(ref m_LeftHandPropulsionAction, value);
         }
 
         [SerializeField]
-        [Tooltip("The Input System Action that will be used to read Snap Turn data from the right hand controller. Must be a Value Vector2 Control.")]
-        InputActionProperty m_RightHandSnapTurnAction;
+        [Tooltip("The Input System Action that will be used to read Propulsion data from the right hand controller. Must be a Value Button Control.")]
+        InputActionProperty m_RightHandPropulsionAction;
         /// <summary>
-        /// The Input System Action that will be used to read Snap Turn data sent from the right hand controller. Must be a <see cref="InputActionType.Value"/> <see cref="Vector2Control"/> Control.
+        /// The Input System Action that will be used to read Propulsion data from the right hand controller. Must be a <see cref="InputActionType.Value"/> <see cref="ButtonControl"/> Control.
         /// </summary>
-        public InputActionProperty RightHandSnapTurnAction
+        public InputActionProperty RightHandPropulsionAction
         {
-            get => m_RightHandSnapTurnAction;
-            set => SetInputActionProperty(ref m_RightHandSnapTurnAction, value);
+            get => m_RightHandPropulsionAction;
+            set => SetInputActionProperty(ref m_RightHandPropulsionAction, value);
         }
 
         [SerializeField]
-        XRController m_LeftHandController;
+        ActionBasedController m_LeftHandController;
         
-        public XRController LeftHandController
+        public ActionBasedController LeftHandController
         {
             get => m_LeftHandController;
             set => m_LeftHandController = value;
         }
         
         [SerializeField]
-        XRController m_RightHandController;
+        ActionBasedController m_RightHandController;
 
 
-        public XRController RightHandController
+        public ActionBasedController RightHandController
         {
             get => m_RightHandController;
             set => m_RightHandController = value;
@@ -67,6 +67,19 @@ namespace Core.HandRocketLocomotion
             set => m_UseGravity = value;
         }
         
+        [SerializeField]
+        [Tooltip("Controls whether gravity affects this provider when a Character Controller is used.")]
+        GameObject m_RemoteControlledObject;
+
+        /// <summary>
+        /// Controls whether gravity affects this provider when a <see cref="CharacterController"/> is used.
+        /// </summary>
+        public GameObject RemoteControlledObject
+        {
+            get => m_RemoteControlledObject;
+            set => m_RemoteControlledObject = value;
+        }
+        
         CharacterController m_CharacterController;
         private bool m_AttemptedGetCharacterController;
 
@@ -76,8 +89,8 @@ namespace Core.HandRocketLocomotion
         /// </summary>
         protected void OnEnable()
         {
-            m_LeftHandSnapTurnAction.EnableDirectAction();
-            m_RightHandSnapTurnAction.EnableDirectAction();
+            m_LeftHandPropulsionAction.EnableDirectAction();
+            m_RightHandPropulsionAction.EnableDirectAction();
         }
 
         /// <summary>
@@ -85,8 +98,8 @@ namespace Core.HandRocketLocomotion
         /// </summary>
         protected void OnDisable()
         {
-            m_LeftHandSnapTurnAction.DisableDirectAction();
-            m_RightHandSnapTurnAction.DisableDirectAction();
+            m_LeftHandPropulsionAction.DisableDirectAction();
+            m_RightHandPropulsionAction.DisableDirectAction();
         }
         
         void SetInputActionProperty(ref InputActionProperty property, InputActionProperty value)
@@ -101,8 +114,8 @@ namespace Core.HandRocketLocomotion
         }
         private void Update()
         {
-            bool leftHandGripped = (m_LeftHandSnapTurnAction.action?.ReadValue<float>() ?? 0.0f) > .0f;
-            bool rightHandGripped = (m_RightHandSnapTurnAction.action?.ReadValue<float>() ?? 0.0f) > .0f;
+            bool leftHandGripped = (m_LeftHandPropulsionAction.action?.ReadValue<float>() ?? 0.0f) > .0f;
+            bool rightHandGripped = (m_RightHandPropulsionAction.action?.ReadValue<float>() ?? 0.0f) > .0f;
 
             var desiredDirection= Vector3.zero;
             
@@ -117,8 +130,10 @@ namespace Core.HandRocketLocomotion
                 Debug.Log("Right Hand is Gripped");
                 desiredDirection += ComputeDesiredDirection(MotionControllerHand.RightHand);
             }
-            
-            MoveRigInDirection(desiredDirection.normalized);
+            desiredDirection = - desiredDirection;
+            Debug.Log($"HandPropulsionProvider wants to move the rig in the direction: {desiredDirection}");
+            m_RemoteControlledObject.transform.rotation = Quaternion.LookRotation(desiredDirection, new Vector3(desiredDirection.y, desiredDirection.z, desiredDirection.x));
+            // MoveRigInDirection(desiredDirection.normalized);
         }
 
         [SuppressMessage("ReSharper", "Unity.PerformanceCriticalCodeNullComparison")]

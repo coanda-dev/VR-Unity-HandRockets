@@ -82,7 +82,8 @@ namespace Core.HandRocketLocomotion
         
         CharacterController m_CharacterController;
         private bool m_AttemptedGetCharacterController;
-
+        private Rigidbody _rb;
+            
         Vector3 m_VerticalVelocity;
         /// <summary>
         /// See <see cref="MonoBehaviour"/>.
@@ -91,6 +92,7 @@ namespace Core.HandRocketLocomotion
         {
             m_LeftHandPropulsionAction.EnableDirectAction();
             m_RightHandPropulsionAction.EnableDirectAction();
+            _rb = system.xrRig.GetComponent<Rigidbody>();
         }
 
         /// <summary>
@@ -114,26 +116,36 @@ namespace Core.HandRocketLocomotion
         }
         private void Update()
         {
+            UpdateRemoteControlledObject();
+            // MoveRigInDirection(desiredDirection.normalized);
+        }
+        
+        private void UpdateRemoteControlledObject()
+        {
+            var targetFlightDirection = ComputeTargetFlightDirection();
+            
+            Debug.Log($"Remote Controlled Obj. Target Direction: {targetFlightDirection.ToString("F4")}");
+            
+            var force = targetFlightDirection.normalized * 10.0f;
+            _rb.AddForce(force);
+        }
+
+        private Vector3 ComputeTargetFlightDirection()
+        {
             bool leftHandGripped = (m_LeftHandPropulsionAction.action?.ReadValue<float>() ?? 0.0f) > .0f;
             bool rightHandGripped = (m_RightHandPropulsionAction.action?.ReadValue<float>() ?? 0.0f) > .0f;
 
-            var desiredDirection= Vector3.zero;
+            var targetFlightDirection= Vector3.zero;
             
             if (leftHandGripped)
-            {
-                Debug.Log("Left Hand is Gripped");
-                desiredDirection += ComputeDesiredDirection(MotionControllerHand.LeftHand);
-            }
-            
+                targetFlightDirection += ComputeDesiredDirection(MotionControllerHand.LeftHand);
+
             if (rightHandGripped)
-            {
-                Debug.Log("Right Hand is Gripped");
-                desiredDirection += ComputeDesiredDirection(MotionControllerHand.RightHand);
-            }
-            desiredDirection = - desiredDirection;
-            Debug.Log($"HandPropulsionProvider wants to move the rig in the direction: {desiredDirection}");
-            m_RemoteControlledObject.transform.rotation = Quaternion.LookRotation(desiredDirection, new Vector3(desiredDirection.y, desiredDirection.z, desiredDirection.x));
-            // MoveRigInDirection(desiredDirection.normalized);
+                targetFlightDirection += ComputeDesiredDirection(MotionControllerHand.RightHand);
+            
+            targetFlightDirection = - targetFlightDirection;
+            
+            return targetFlightDirection;
         }
 
         [SuppressMessage("ReSharper", "Unity.PerformanceCriticalCodeNullComparison")]

@@ -705,7 +705,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_System: {fileID: 7830906633349983297}
-  forceSize: 7
+  _thrustForceScale: 10
+  _leftHandRotation:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Left Hand Rotation
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 0a9fce15-9769-46a3-8f72-bc2161fe39f0
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+    m_Reference: {fileID: 8248158260566104461, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  _rightHandRotation:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Right Hand Rotation
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: e5b76c8c-fc6c-4a82-8cfd-e5f9a4bf1e12
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+    m_Reference: {fileID: 5101698808175986029, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  _leftPropulsionGaugeAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Left Propulsion Gauge
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 6f552b0f-bf52-4441-9d7c-a4d92e760dbd
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+    m_Reference: {fileID: -6131295136447488360, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  _rightPropulsionGaugeAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Right Propulsion Gauge
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: b16325e7-cb3c-469d-8f0c-b1936e3da615
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+    m_Reference: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
 --- !u!1 &7830906633457716405
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,6 +791,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7830906632932056600}
     m_Modifications:
+    - target: {fileID: 524808230091443067, guid: 96befac32a9132642aa37dfc439c6130, type: 3}
+      propertyPath: _propulsionGaugeAction.m_Reference
+      value: 
+      objectReference: {fileID: -6131295136447488360, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    - target: {fileID: 524808230091443067, guid: 96befac32a9132642aa37dfc439c6130, type: 3}
+      propertyPath: _propulsionGaugeAction.m_Action.m_Id
+      value: f71d12af-20f2-4716-9799-a5d4d718953c
+      objectReference: {fileID: 0}
+    - target: {fileID: 524808230091443067, guid: 96befac32a9132642aa37dfc439c6130, type: 3}
+      propertyPath: _propulsionGaugeAction.m_UseReference
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 524808230091443067, guid: 96befac32a9132642aa37dfc439c6130, type: 3}
+      propertyPath: _propulsionGaugeAction.m_Action.m_Name
+      value: Propulsion Gauge
+      objectReference: {fileID: 0}
     - target: {fileID: 1219916174978714396, guid: 96befac32a9132642aa37dfc439c6130, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -860,6 +920,22 @@ PrefabInstance:
     - target: {fileID: 3007788128807744791, guid: 782f520d342302148b10be6ce18c7a23, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475366763896878448, guid: 782f520d342302148b10be6ce18c7a23, type: 3}
+      propertyPath: _propulsionGaugeAction.m_Reference
+      value: 
+      objectReference: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    - target: {fileID: 4475366763896878448, guid: 782f520d342302148b10be6ce18c7a23, type: 3}
+      propertyPath: _propulsionGaugeAction.m_Action.m_Id
+      value: bdad153a-2f53-49be-8d62-5763034f494d
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475366763896878448, guid: 782f520d342302148b10be6ce18c7a23, type: 3}
+      propertyPath: _propulsionGaugeAction.m_UseReference
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475366763896878448, guid: 782f520d342302148b10be6ce18c7a23, type: 3}
+      propertyPath: _propulsionGaugeAction.m_Action.m_Name
+      value: Propulsion Gauge
       objectReference: {fileID: 0}
     - target: {fileID: 6383241691354190356, guid: 782f520d342302148b10be6ce18c7a23, type: 3}
       propertyPath: m_Materials.Array.data[0]

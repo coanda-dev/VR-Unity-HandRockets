@@ -950,9 +950,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 250450298}
     m_Modifications:
-    - target: {fileID: 7830906632311821377, guid: b9d50aae6b5306a4dadce2c561b31438, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
+    - target: {fileID: 1242858711233788169, guid: b9d50aae6b5306a4dadce2c561b31438, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805664491349958139, guid: b9d50aae6b5306a4dadce2c561b31438, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7830906632819567508, guid: b9d50aae6b5306a4dadce2c561b31438, type: 3}
       propertyPath: m_Name

@@ -1,7 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
+using CommonUsages = UnityEngine.XR.CommonUsages;
 using InputDevice = UnityEngine.XR.InputDevice;
 
 namespace HandRockets.Scripts.XR.Locomotion
@@ -13,14 +18,104 @@ namespace HandRockets.Scripts.XR.Locomotion
     /// <seealso cref="LocomotionProvider"/>
     public class HandPropulsionProvider : LocomotionProvider
     {
-        #region Properties and Fields
+        #region Fields
 
         [SerializeField] [Tooltip("Scale the magnitude of the thrust force.")]
-        private float forceSize = 10.0f;
+        private float _thrustForceScale = 10.0f;
 
         private Rigidbody _xrRigRigidbody;
 
         #endregion
+
+        #region Input Control
+
+        [SerializeField]
+        [Tooltip(
+            "The Input System Action that will be used to read the orientation of the right hand. Must be a Value Quaternion Control.")]
+        InputActionProperty _leftHandRotation;
+
+        /// <summary>
+        /// The Input System Action that will be used to read the orientation of the right hand. Must be a <see cref="InputActionType.Value"/> <see cref="QuaternionControl"/> Control.
+        /// </summary>
+        public InputActionProperty LeftHandRotation
+        {
+            get => _leftHandRotation;
+            set => SetInputActionProperty(ref _leftHandRotation, value);
+        }
+
+        [SerializeField]
+        [Tooltip(
+            "The Input System Action that will be used to read the orientation of the right hand. Must be a Value Quaternion Control.")]
+        InputActionProperty _rightHandRotation;
+
+        /// <summary>
+        /// The Input System Action that will be used to read the orientation of the right hand. Must be a <see cref="InputActionType.Value"/> <see cref="QuaternionControl"/> Control.
+        /// </summary>
+        public InputActionProperty RightHandRotation
+        {
+            get => _rightHandRotation;
+            set => SetInputActionProperty(ref _rightHandRotation, value);
+        }
+
+
+        [SerializeField]
+        [Tooltip(
+            "The Input System Action that will be used to read Propulsion data from the left hand. Must be a Value float Control.")]
+        InputActionProperty _leftPropulsionGaugeAction;
+
+        /// <summary>
+        /// The Input System Action that will be used to read Propulsion data from the left hand. Must be a <see cref="InputActionType.Value"/> <see cref="AxisControl"/> Control.
+        /// </summary>
+        public InputActionProperty LeftPropulsionGaugeAction
+        {
+            get => _leftPropulsionGaugeAction;
+            set => SetInputActionProperty(ref _leftPropulsionGaugeAction, value);
+        }
+
+        [SerializeField]
+        [Tooltip(
+            "The Input System Action that will be used to read Propulsion data from the right hand. Must be a Value float Control.")]
+        InputActionProperty _rightPropulsionGaugeAction;
+
+        /// <summary>
+        /// The Input System Action that will be used to read Propulsion data from the right hand. Must be a <see cref="InputActionType.Value"/> <see cref="AxisControl"/> Control.
+        /// </summary>
+        public InputActionProperty RightPropulsionGaugeAction
+        {
+            get => _rightPropulsionGaugeAction;
+            set => SetInputActionProperty(ref _rightPropulsionGaugeAction, value);
+        }
+
+        void SetInputActionProperty(ref InputActionProperty property, InputActionProperty value)
+        {
+            if (Application.isPlaying)
+                property.DisableDirectAction();
+
+            property = value;
+
+            if (Application.isPlaying && isActiveAndEnabled)
+                property.EnableDirectAction();
+        }
+
+        #endregion
+
+        #region Lifecycle Methods
+
+        private void OnEnable()
+        {
+            _leftHandRotation.EnableDirectAction();
+            _rightHandRotation.EnableDirectAction();
+            _leftPropulsionGaugeAction.EnableDirectAction();
+            _rightPropulsionGaugeAction.EnableDirectAction();
+        }
+
+        private void OnDisable()
+        {
+            _leftHandRotation.DisableDirectAction();
+            _rightHandRotation.DisableDirectAction();
+            _leftPropulsionGaugeAction.DisableDirectAction();
+            _rightPropulsionGaugeAction.DisableDirectAction();
+        }
 
         private void Start()
         {
@@ -29,96 +124,44 @@ namespace HandRockets.Scripts.XR.Locomotion
 
         private void Update()
         {
-            Vector3 thrustForce = ComputeThrustVector();
-            _xrRigRigidbody.AddForce(thrustForce * forceSize);
+            Vector3 thrustForceDirection = ComputeThrustForceDirection();
+            _xrRigRigidbody.AddForce(thrustForceDirection * _thrustForceScale);
         }
 
-        /// <summary>
-        /// Differentiate between the motion controller hands.
-        /// </summary>
-        private enum MotionControllerHand
-        {
-            LeftHand,
-            RightHand,
-        }
+        #endregion
 
-        /// <summary>
-        /// Determines the current direction the palm of the <paramref name="hand"/> is facing.
-        /// </summary>
-        /// <param name="hand">The hand to inquire about.</param>
-        Vector3 GetPalmFacingDirection(MotionControllerHand hand)
-        {
-            InputDevice inputDevice = new InputDevice();
-            Vector3 palmFacingDirection = Vector3.one;
-
-            switch (hand)
-            {
-                case MotionControllerHand.LeftHand:
-                    inputDevice = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
-                    palmFacingDirection = Vector3.right;
-                    break;
-                case MotionControllerHand.RightHand:
-                    inputDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-                    palmFacingDirection = Vector3.left;
-                    break;
-                default:
-                    Assert.IsTrue(false, $"Exhausted options in {nameof(GetPalmFacingDirection)} for hands.");
-                    break;
-            }
-
-            Quaternion rotation = Quaternion.identity;
-            if (inputDevice.isValid)
-                inputDevice.TryGetFeatureValue(CommonUsages.deviceRotation, out rotation);
-
-            return rotation * palmFacingDirection;
-        }
-
-        /// <summary>
-        /// Determines the current pressed amount of the grip button on the motion controller held
-        /// in <paramref name="hand"/>.
-        /// </summary>
-        /// <param name="hand"></param>
-        /// <returns></returns>
-        float GetGripValue(MotionControllerHand hand)
-        {
-            InputDevice inputDevice = new InputDevice();
-
-            switch (hand)
-            {
-                case MotionControllerHand.LeftHand:
-                    inputDevice = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
-                    break;
-                case MotionControllerHand.RightHand:
-                    inputDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-                    break;
-            }
-
-            float value = 0.0f;
-            if (inputDevice.isValid)
-                inputDevice.TryGetFeatureValue(CommonUsages.grip, out value);
-
-            return value;
-        }
+        #region Private Methods
 
         /// <summary>
         /// Determines the thrust force vector by summing up the opposite directions the two palms are facing.
         /// </summary>
         /// <returns></returns>
-        Vector3 ComputeThrustVector()
+        Vector3 ComputeThrustForceDirection()
         {
             // Variable to accumulate the vectors in
-            Vector3 thrustForce = Vector3.zero;
+            Vector3 thrustForceDirection = Vector3.zero;
 
             // Compute the left hand palm direction only if the left grip button is pressed
-            float leftGripPressure = GetGripValue(MotionControllerHand.LeftHand);
-            if (leftGripPressure >= 0.1)
-                thrustForce += -GetPalmFacingDirection(MotionControllerHand.LeftHand) * leftGripPressure;
-            // Compute the right hand palm direction only if the right grip button is pressed
-            float rightGripPressure = GetGripValue(MotionControllerHand.RightHand);
-            if (rightGripPressure >= 0.1)
-                thrustForce += -GetPalmFacingDirection(MotionControllerHand.RightHand) * rightGripPressure;
+            float leftGripGauge = _leftPropulsionGaugeAction.action?.ReadValue<float>() ?? 0.0f;
+            if (leftGripGauge >= 0.1)
+            {
+                Quaternion leftHandOrientation =
+                    _leftHandRotation.action?.ReadValue<Quaternion>() ?? Quaternion.identity;
+                thrustForceDirection += leftHandOrientation * Vector3.right;
+            }
 
-            return thrustForce;
+            // Compute the right hand palm direction only if the right grip button is pressed
+            float rightGripPressure = _rightPropulsionGaugeAction.action?.ReadValue<float>() ?? 0.0f;
+            if (rightGripPressure >= 0.1)
+            {
+                Quaternion rightHandOrientation =
+                    _rightHandRotation.action?.ReadValue<Quaternion>() ?? Quaternion.identity;
+                thrustForceDirection += rightHandOrientation * Vector3.left;
+            }
+
+            return -thrustForceDirection;
         }
+
+        #endregion
     }
 }

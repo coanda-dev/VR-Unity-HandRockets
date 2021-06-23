@@ -691,7 +691,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Timeout: 10
-  m_XRRig: {fileID: 0}
+  m_XRRig: {fileID: 7830906632819567513}
 --- !u!114 &7830906633349983298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -706,6 +706,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_System: {fileID: 7830906633349983297}
   _thrustForceScale: 10
+  _propulsionType: 0
   _leftHandRotation:
     m_UseReference: 1
     m_Action:

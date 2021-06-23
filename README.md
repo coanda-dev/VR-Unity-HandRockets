@@ -2,7 +2,7 @@
 An implementation of the Hand-Rockets locomotion technique.
 
 ## Summary
-The hand-rockets locomotion technique, featured in [Iron Man VR](https://www.marvel.com/games/marvel-s-iron-man-vr), [Rocket Skates VR](https://store.steampowered.com/app/1535200/Rocket_Skates_VR/) and in a slightly different form in [Megaton Rainfall](https://store.steampowered.com/app/430210/Megaton_Rainfall/) is a stearing metaphor. It simulates the felling of having a rocket strapped to your arm and flying through the air. Based on the orientation of the user's hands, the direction he/she is traveling changes.
+The hand-rockets locomotion technique, featured in [Iron Man VR](https://www.marvel.com/games/marvel-s-iron-man-vr), [Rocket Skates VR](https://store.steampowered.com/app/1535200/Rocket_Skates_VR/) and in a slightly different form in [Megaton Rainfall](https://store.steampowered.com/app/430210/Megaton_Rainfall/) is a steering metaphor. It simulates the feeling of having a rocket strapped to your arm and flying through the air. Based on the orientation of the user's hands, the direction he/she is traveling changes.
 
 ## Setup
 This is a Unity 2020.3.1 project. Feel free to test it on your own machine. Should be HMD independent, as the input is polled via the XR Interaction Toolkit and the Input System. Simply download the repository and add it to Unity. The editor should download the dependecies and then you should be good to go.

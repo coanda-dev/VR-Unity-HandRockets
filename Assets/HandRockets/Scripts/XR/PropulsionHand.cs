@@ -1,3 +1,5 @@
+using HandRockets.Scripts.XR.Locomotion;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -10,18 +12,22 @@ namespace HandRockets.Scripts.XR
     public class PropulsionHand : MonoBehaviour
     {
         #region Fields
-        
+
         // Animation
         private Animator _animator;
         private static readonly int Grip = Animator.StringToHash("Grip");
-        
+
         // Visual Effect
         private VisualEffect _vfx;
         private bool _isEffectPlaying;
-        
+
+        [SerializeField]
+        private HandPropulsionProvider.PropulsionType _propulsionType = HandPropulsionProvider.PropulsionType.Palm;
+
         // Gauge 
         private float _currentGrip;
         [SerializeField] private float _gripSpeed = 1.0f;
+
         #endregion
 
         #region Properties
@@ -57,7 +63,7 @@ namespace HandRockets.Scripts.XR
             if (Application.isPlaying && isActiveAndEnabled)
                 property.EnableDirectAction();
         }
-        
+
         #endregion
 
         #region Lifecycle Functions
@@ -66,6 +72,10 @@ namespace HandRockets.Scripts.XR
         {
             _animator = GetComponent<Animator>();
             _vfx = GetComponentInChildren<VisualEffect>();
+            if (_propulsionType == HandPropulsionProvider.PropulsionType.Backwards)
+            {
+                _vfx.transform.rotation = Quaternion.Euler(-90, 0, 0);
+            }
         }
 
         private void OnEnable()
@@ -87,14 +97,15 @@ namespace HandRockets.Scripts.XR
             _currentGrip = Mathf.MoveTowards(_currentGrip, _targetGrip, Time.deltaTime * _gripSpeed);
 
             // UpdateControllerInputValues();
-            
+
             // Update animation
             _animator.SetFloat(Grip, _currentGrip);
-            
+
             UpdateVisualEffect();
         }
+
         #endregion
-        
+
         private void UpdateVisualEffect()
         {
             if (_currentGrip > .1 && !_isEffectPlaying)

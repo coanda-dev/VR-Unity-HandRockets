@@ -25,6 +25,14 @@ namespace HandRockets.Scripts.XR.Locomotion
 
         private Rigidbody _xrRigRigidbody;
 
+        public enum PropulsionType
+        {
+            Palm,
+            Backwards
+        }
+
+        [SerializeField] private PropulsionType _propulsionType = PropulsionType.Palm;
+
         #endregion
 
         #region Input Control
@@ -140,6 +148,7 @@ namespace HandRockets.Scripts.XR.Locomotion
         {
             // Variable to accumulate the vectors in
             Vector3 thrustForceDirection = Vector3.zero;
+            Vector3 propulsionDirection = Vector3.back;
 
             // Compute the left hand palm direction only if the left grip button is pressed
             float leftGripGauge = _leftPropulsionGaugeAction.action?.ReadValue<float>() ?? 0.0f;
@@ -147,7 +156,9 @@ namespace HandRockets.Scripts.XR.Locomotion
             {
                 Quaternion leftHandOrientation =
                     _leftHandRotation.action?.ReadValue<Quaternion>() ?? Quaternion.identity;
-                thrustForceDirection += leftHandOrientation * Vector3.right;
+                if (_propulsionType == PropulsionType.Palm)
+                    propulsionDirection = Vector3.right;
+                thrustForceDirection += leftHandOrientation * propulsionDirection;
             }
 
             // Compute the right hand palm direction only if the right grip button is pressed
@@ -156,7 +167,9 @@ namespace HandRockets.Scripts.XR.Locomotion
             {
                 Quaternion rightHandOrientation =
                     _rightHandRotation.action?.ReadValue<Quaternion>() ?? Quaternion.identity;
-                thrustForceDirection += rightHandOrientation * Vector3.left;
+                if (_propulsionType == PropulsionType.Palm)
+                    propulsionDirection = Vector3.left;
+                thrustForceDirection += rightHandOrientation * propulsionDirection;
             }
 
             return -thrustForceDirection;

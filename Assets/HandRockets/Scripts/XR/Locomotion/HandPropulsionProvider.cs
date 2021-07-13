@@ -132,8 +132,13 @@ namespace HandRockets.Scripts.XR.Locomotion
 
         private void Update()
         {
-            Vector3 thrustForceDirection = ComputeThrustForceDirection();
-            _xrRigRigidbody.AddForce(thrustForceDirection * _thrustForceScale);
+            Vector3 thrustForce = ComputeThrustForce();
+            if (CanBeginLocomotion() && BeginLocomotion())
+            {
+                Debug.Log((thrustForce * _thrustForceScale).ToString());
+                _xrRigRigidbody.AddForce(thrustForce * _thrustForceScale);
+                EndLocomotion();
+            }
         }
 
         #endregion
@@ -144,7 +149,7 @@ namespace HandRockets.Scripts.XR.Locomotion
         /// Determines the thrust force vector by summing up the opposite directions the two palms are facing.
         /// </summary>
         /// <returns></returns>
-        Vector3 ComputeThrustForceDirection()
+        Vector3 ComputeThrustForce()
         {
             // Variable to accumulate the vectors in
             Vector3 thrustForceDirection = Vector3.zero;
@@ -158,18 +163,18 @@ namespace HandRockets.Scripts.XR.Locomotion
                     _leftHandRotation.action?.ReadValue<Quaternion>() ?? Quaternion.identity;
                 if (_propulsionType == PropulsionType.Palm)
                     propulsionDirection = Vector3.right;
-                thrustForceDirection += leftHandOrientation * propulsionDirection;
+                thrustForceDirection += leftHandOrientation * propulsionDirection * leftGripGauge;
             }
 
             // Compute the right hand palm direction only if the right grip button is pressed
-            float rightGripPressure = _rightPropulsionGaugeAction.action?.ReadValue<float>() ?? 0.0f;
-            if (rightGripPressure >= 0.1)
+            float rightGripGauge = _rightPropulsionGaugeAction.action?.ReadValue<float>() ?? 0.0f;
+            if (rightGripGauge >= 0.1)
             {
                 Quaternion rightHandOrientation =
                     _rightHandRotation.action?.ReadValue<Quaternion>() ?? Quaternion.identity;
                 if (_propulsionType == PropulsionType.Palm)
                     propulsionDirection = Vector3.left;
-                thrustForceDirection += rightHandOrientation * propulsionDirection;
+                thrustForceDirection += rightHandOrientation * propulsionDirection * rightGripGauge;
             }
 
             return -thrustForceDirection;

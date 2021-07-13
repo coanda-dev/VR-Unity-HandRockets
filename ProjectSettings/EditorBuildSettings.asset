@@ -5,9 +5,21 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Development/Scenes/Playground.unity
     guid: d1c3109bdb54ad54c8a2b2838528e640
+  - enabled: 0
+    path: Assets/HandRockets/Scenes/BaseScene.unity
+    guid: 90cf33b275bbbd349a9302e5a9ff369b
+  - enabled: 0
+    path: Assets/HandRockets/Scenes/TerrainTraversalScene.unity
+    guid: d17c1a87ecafea44182e107273127d8b
+  - enabled: 0
+    path: Assets/HandRockets/Scenes/RingsScene.unity
+    guid: 3a9039c8a49ed3043a608c441d0145ca
+  - enabled: 1
+    path: Assets/HandRockets/Scenes/PlatformerScene.unity
+    guid: ceeb30970f338e84f89cf5b50faeea5f
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 452a0af77e9723c4fba2a16ef11cece3, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 71ea003dc45e7c34aa3aa41962b6c4ea, type: 2}
